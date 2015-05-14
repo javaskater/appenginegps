@@ -1,0 +1,23 @@
+application: traces
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers: #static resources first https://cloud.google.com/appengine/docs/python/gettingstartedpython27/staticfiles 
+- url: /css
+  static_dir: css
+- url: /images
+  static_dir: images
+- url: .*
+  script: tracesgps.application
+
+libraries:
+- name: webapp2
+  version: 2.5.2
+- name: jinja2
+  version: '2.6'
+- name: markupsafe
+  version: '0.15'
+- name: lxml
+  version: '2.3'
