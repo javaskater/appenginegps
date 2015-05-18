@@ -24,9 +24,51 @@
 	<div class="container">
 		<div class="row">
 			<div class="one-half column" style="margin-top: 25%">
-				<p>La Vitesse Moyenne de Solène est : {{ vitesse_moyenne }} km/h; elle a parccouru: {{ distance_parcourue }} kilomètres</p>
+				<p>Bonjour nous somme le : {{ ajourdhui }} </p>
+			</div>
+			<div class="one-half column" id="chart" style="margin:5%">
 			</div>
 		</div>
 	</div>
+<!--[if lt IE 9]><script src="/js/excanvas.min.js"></script><![endif]-->
+    <script src="/js/flotr2.min.js"></script>
+    <script src="/js/jquery-2.1.4.min.js"></script>
+     <!--<script src="/js/flotr2.js"></script>
+    <script src="/js/js/jquery-2.1.4.js"></script> -->
+    <script>
+    $( document ).ready(function( $ )  {
+    	//http://api.jquery.com/jquery.getjson/
+    	$.getJSON( "traces/aulnay le 11 mars 2015.gpx", function( data ) {//passer en GET ou POST parameters ?
+    	   var graphdatas = data['speed_datas'];
+    	   var zero = []
+    	   //for (i=0; i < graphdatas.length; i++) { zero.push([graphdatas[i][0], 0]); };
+		   Flotr.draw(
+   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
+   	           ,[
+   	               //{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
+   	               { data: graphdatas, label: "vitesse en m/s", lines: {show:true}},
+   	            ],
+   	           {
+   	               title: "Vitesse de Solène versus distancce parcourue",
+   	               grid: {horizontalLines: false, verticalLines: false},
+	   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
+		   	            mode: "time",
+		   	            timeformat: "%H:%M:%S" 
+		   	        },
+   	            }
+   	       );
+		});
+    	$("#chart").fadeIn('slow', function() {
+    	    var styles = {
+    	    		width : "600px",
+    	    		height : "450px",
+    	    		backgroundColor : "yellow",
+    	    		visibility : "visible"
+    	     };
+    	     $(this).css(styles);
+    	});
+   	});
+</script>
+    </script>
 </body>
 </html>

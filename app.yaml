@@ -9,6 +9,8 @@ handlers: #static resources first https://cloud.google.com/appengine/docs/python
   static_dir: css
 - url: /images
   static_dir: images
+- url: /js
+  static_dir: js
 - url: .*
   script: tracesgps.application
 
