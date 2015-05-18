@@ -27,7 +27,7 @@ class TraceHandler(webapp2.RequestHandler):
         vitesse_moyenne = 0
         donnees_vitesse = []
         for res_dict in array_results:
-            donnees_vitesse.append([calendar.timegm(res_dict['t'].timetuple()) * 1000,res_dict['vl']]) #https://flot.googlecode.com/svn/trunk/API.txt timestaps in milliseconds
+            donnees_vitesse.append([calendar.timegm(res_dict['t'].timetuple()) * 1000,res_dict['vl']*3.6]) #https://flot.googlecode.com/svn/trunk/API.txt timestaps in milliseconds
             vitesse_moyenne += res_dict['vl']
         vitesse_moyenne = vitesse_moyenne/len(array_results)
         distance_parcourue = array_results[-1]['dc']
