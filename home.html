@@ -20,14 +20,24 @@
 	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <link rel="icon" type="image/png" href="/images/favicon.png" />
 </head>
-<body>
-	<div class="container">
+<body> <!-- For the form http://getskeleton.com/#examples -->
+	<div class="container" class="docs-section">
 		<div class="row">
-			<div class="one-half column" style="margin-top: 25%">
-				<p>Bonjour nous somme le : {{ ajourdhui }} </p>
+			<div class="twelve columns">
+			      <label for="TitlelInput">Le Titre de votre performance:</label>
+			      <input class="u-full-width" placeholder="Le titre de votre performance" id="TitlelInput" type="text">
+			    </div>
+			   </div>
+			   <div class="row">
+			    <div class="six columns">
+			     <label for="FichierInput">La trace GPS à charger depuis votre ordinateur:</label>
+			      <input class="u-full-width" placeholder="votre_fichier_gps.gpx" id="FichierInput" type="file">
+			    </div>
+			    <div class="six columns">
+			      <input class="button-primary" value="importer et afficher" type="button" id="gpxsub">
 			</div>
-			<div class="one-half column" id="chart" style="margin:5%">
-			</div>
+		</div>
+		<div class="u-full-width" id="chart">
 		</div>
 	</div>
 <!--[if lt IE 9]><script src="/js/excanvas.min.js"></script><![endif]-->
@@ -37,35 +47,50 @@
     <script src="/js/js/jquery-2.1.4.js"></script> -->
     <script>
     $( document ).ready(function( $ )  {
-    	//http://api.jquery.com/jquery.getjson/
-    	$.getJSON( "traces/aulnay le 11 mars 2015.gpx", function( data ) {//passer en GET ou POST parameters ?
-    	   var graphdatas = data['speed_datas'];
-    	   var zero = []
-    	   //for (i=0; i < graphdatas.length; i++) { zero.push([graphdatas[i][0], 0]); };
-		   Flotr.draw(
-   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
-   	           ,[
-   	               //{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
-   	               { data: graphdatas, label: "vitesse en m/s", lines: {show:true}},
-   	            ],
-   	           {
-   	               title: "Vitesse de Solène versus distancce parcourue",
-   	               grid: {horizontalLines: false, verticalLines: false},
-	   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
-		   	            mode: "time",
-		   	            timeformat: "%H:%M:%S" 
-		   	        },
-   	            }
-   	       );
-		});
-    	$("#chart").fadeIn('slow', function() {
-    	    var styles = {
-    	    		width : "60em",
-    	    		height : "40em",
-    	    		backgroundColor : "yellow",
-    	    		visibility : "visible"
-    	     };
-    	     $(this).css(styles);
+    	$("#gpxsub").on("click",function(){
+    		var nomfic = $("#FichierInput").val();
+    		if (nomfic.match(/\.gpx$/i)){
+		    	//http://api.jquery.com/jquery.getjson/
+		    	$.getJSON( "traces/aulnay le 11 mars 2015.gpx", function( data ) {//passer en GET ou POST parameters ?
+		    	   var graphdatas = data['speed_datas'];
+		    	   var zero = []
+		    	   //for (i=0; i < graphdatas.length; i++) { zero.push([graphdatas[i][0], 0]); };
+		    	   var styles = {
+		    	    		//width : "60em",
+		    	    		height : "40em",
+		    	    		//backgroundColor : "yellow",
+		    	    		visibility : "hidden"
+		    	     };
+		    	   $("#chart").css(styles);
+		    	   $("#chart").addClass("u-full-width");
+				   Flotr.draw(
+		   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
+		   	           ,[
+		   	               //{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
+		   	               { data: graphdatas, lines: {show:true}},
+		   	            ],
+		   	           {
+		   	               title: "Vitesse de Solène versus distancce parcourue",
+		   	               grid: {horizontalLines: false, verticalLines: false},
+			   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
+				   	            mode: "time",
+				   	            timeformat: "%H:%M:%S" 
+				   	        },
+		   	            }
+		   	       )
+				});
+    		} else {
+    			var messageErreur = $('<h3>').html("<h3>Le fichier /:"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
+    			messageErreur.css('color','red');
+    			$("#chart").append( messageErreur );
+    		}
+    		$("#chart").fadeIn("slow", function() {
+	    	    var styles = {
+	    	    		visibility : "visible"
+	    	     };
+	    	     $(this).css(styles);
+	    	     $(this).addClass("u-max-full-width");
+	    	});
     	});
    	});
 </script>
