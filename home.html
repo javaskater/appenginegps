@@ -48,6 +48,7 @@
     <script>
     $( document ).ready(function( $ )  {
     	$("#gpxsub").on("click",function(){
+    		$("#chart").html("");
     		var nomfic = $("#FichierInput").val();
     		if (nomfic.match(/\.gpx$/i)){
 		    	//http://api.jquery.com/jquery.getjson/
@@ -78,19 +79,14 @@
 				   	        },
 		   	            }
 		   	       )
+		   	       $("#chart").css('visibility','visible');
 				});
     		} else {
     			var messageErreur = $('<h3>').html("<h3>Le fichier /:"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
     			messageErreur.css('color','red');
     			$("#chart").append( messageErreur );
+    			$("#chart").css('visibility','visible');
     		}
-    		$("#chart").fadeIn("slow", function() {
-	    	    var styles = {
-	    	    		visibility : "visible"
-	    	     };
-	    	     $(this).css(styles);
-	    	     $(this).addClass("u-max-full-width");
-	    	});
     	});
    	});
 </script>
