@@ -22,21 +22,23 @@
 </head>
 <body> <!-- For the form http://getskeleton.com/#examples -->
 	<div class="container" class="docs-section">
-		<div class="row">
-			<div class="twelve columns">
-			      <label for="TitlelInput">Le Titre de votre performance:</label>
-			      <input class="u-full-width" placeholder="Le titre de votre performance" id="TitlelInput" type="text">
-			    </div>
-			   </div>
-			   <div class="row">
-			    <div class="six columns">
-			     <label for="FichierInput">La trace GPS à charger depuis votre ordinateur:</label>
-			      <input class="u-full-width" placeholder="votre_fichier_gps.gpx" id="FichierInput" type="file">
-			    </div>
-			    <div class="six columns">
-			      <input class="button-primary" value="importer et afficher" type="button" id="gpxsub">
+		<form action="{{ upload_url }}" id="gpsForm" method="POST" enctype="multipart/form-data">
+			<div class="row">
+				<div class="twelve columns">
+				      <label for="TitlelInput">Le Titre de votre performance:</label>
+				      <input class="u-full-width" placeholder="Le titre de votre performance" id="TitlelInput" type="text">
+				    </div>
+				   </div>
+				   <div class="row">
+				    <div class="six columns">
+				     <label for="FichierInput">La trace GPS à charger depuis votre ordinateur:</label>
+				      <input class="u-full-width" placeholder="votre_fichier_gps.gpx" id="FichierInput" name="gpxfile" type="file">
+				    </div>
+				    <div class="six columns">
+				      <input class="button-primary" value="importer et afficher" type="submit" id="gpxsub">
+				</div>
 			</div>
-		</div>
+		</form>
 		<div class="u-full-width" id="chart">
 		</div>
 	</div>
@@ -47,7 +49,51 @@
     <script src="/js/js/jquery-2.1.4.js"></script> -->
     <script>
     $( document ).ready(function( $ )  {
-    	$("#gpxsub").on("click",function(){
+    	$('#gpsForm').on('submit', function (e) {
+	        // On empêche le navigateur de soumettre le formulaire
+    		e.preventDefault();
+            $("#chart").html("");
+    		var nomfic = $("#FichierInput").val();
+    		if (nomfic.match(/\.gpx$/i)){
+	            var $form = $(this); //see http://chez-syl.fr/2015/02/jquery-uploader-une-image-en-ajax-avec-un-apercu-avant-envoi/
+	            var formdata = (window.FormData) ? new FormData($form[0]) : null;
+	            var data = (formdata !== null) ? formdata : $form.serialize();
+	            $.ajax({
+	                url: $form.attr('action'),
+	                type: $form.attr('method'),
+	                contentType: false, // obligatoire pour de l'upload
+	                processData: false, // obligatoire pour de l'upload
+	                dataType: 'json', // selon le retour attendu
+	                data: data,
+	                success: function (response) {
+	                	var graphdatas = response['speed_datas'];
+	                	Flotr.draw(
+     		   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
+     		   	           ,[
+     		   	               //{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
+     		   	               { data: graphdatas, lines: {show:true}},
+     		   	            ],
+     		   	           {
+     		   	               title: "Vitesse de Solène versus distancce parcourue",
+     		   	               grid: {horizontalLines: false, verticalLines: false},
+     			   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
+     				   	            mode: "time",
+     				   	            timeformat: "%H:%M:%S" 
+     				   	        },
+     		   	            }
+     		   	       );
+	     		   	   $("#chart").css('visibility','visible');
+	     		   	 }) //fin du success callback
+	            }); //Fin de la requête Ajax
+    		} else {
+    			var messageErreur = $('<h3>').html("<h3>Le fichier /:"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
+    			messageErreur.css('color','red');
+    			$("#chart").append( messageErreur );
+    			$("#chart").css('visibility','visible');
+    		}
+    		return false;
+        });
+    	/*$("#gpxsub").on("click",function(){
     		$("#chart").html("");
     		var nomfic = $("#FichierInput").val();
     		if (nomfic.match(/\.gpx$/i)){
@@ -87,7 +133,7 @@
     			$("#chart").append( messageErreur );
     			$("#chart").css('visibility','visible');
     		}
-    	});
+    	});*/
    	});
 </script>
     </script>

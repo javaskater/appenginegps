@@ -10,13 +10,24 @@ from lxml import etree as lxmlparser
 import lxml
 from datetime import datetime
 import math
+import StringIO
 
-#tiré de la page 186 de Python CookBook Third Edition et de http://lxml.de/tutorial.html
-def parse_and_remove(filename):
+def parse_and_remove_fic(filename):
+    xmlContent = ""
+    for line in open(filename).readlines():
+        xmlContent += line
+    if len(xmlContent) > 0:
+        parse_and_remove(xmlContent)
+        return 0
+    else:
+        return 1
+
+def parse_and_remove(xmlStringContent): #tiré de la page 186 de Python CookBook Third Edition et de http://lxml.de/tutorial.html
     saxpath=['{http://www.topografix.com/GPX/1/1}gpx','{http://www.topografix.com/GPX/1/1}trk', '{http://www.topografix.com/GPX/1/1}trkseg', '{http://www.topografix.com/GPX/1/1}trkpt']
-    doc = lxmlparser.iterparse(filename, ('start', 'end'))
-    # Skip the root element
-    #next(doc)
+    xmlContent = ""
+    doc = lxmlparser.iterparse(StringIO.StringIO(xmlStringContent), ('start', 'end')) #https://docs.python.org/2/library/stringio.html
+        # Skip the root element
+        #next(doc)
     tag_stack = []
     elem_stack = []
     #https://bugs.launchpad.net/lxml/+bug/1185701 attention bug de iterparse qui envoie un none si end root
@@ -38,7 +49,7 @@ def parse_and_remove(filename):
         except lxml.etree.LxmlError as e: #OK même si en rouge http://lxml.de/api/lxml.etree.LxmlError-class.html
             break
     del doc
-        
+    
 #http://lxml.de/tutorial.html
 def recupere_donnees(element):
     retour = {}
@@ -101,9 +112,9 @@ def calcule_distance_parcourue(donnees_avant,donnees_actuelles):
         print ("longitude du point 1 absente\n")
     return (distance , vitesse)
 
-def traduction_gpx_vers_csv(path_gpx):
+def traduction_gpx_vers_csv(xml_str_content):
     points=[]
-    for domElem in parse_and_remove(path_gpx):
+    for domElem in parse_and_remove(xml_str_content):
         points.append(recupere_donnees(domElem))
     #print ("il y a {0} points\n".format(len(points)))
     #nous allons calculer la distance cumulée et l'enregistrer(la formule nous a retourné la distance directement en kms)
