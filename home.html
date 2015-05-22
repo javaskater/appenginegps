@@ -35,7 +35,7 @@
 				      <input class="u-full-width" placeholder="votre_fichier_gps.gpx" id="FichierInput" name="gpxfile" type="file">
 				    </div>
 				    <div class="six columns">
-				      <input class="button-primary" value="importer et afficher" type="submit" id="gpxsub">
+				      <input class="button-primary" value="importer et afficher" type="button" id="gpxsub">
 				</div>
 			</div>
 		</form>
@@ -45,17 +45,14 @@
 <!--[if lt IE 9]><script src="/js/excanvas.min.js"></script><![endif]-->
     <script src="/js/flotr2.min.js"></script>
     <script src="/js/jquery-2.1.4.min.js"></script>
-     <!--<script src="/js/flotr2.js"></script>
-    <script src="/js/js/jquery-2.1.4.js"></script> -->
     <script>
-    $( document ).ready(function( $ )  {
-    	$('#gpsForm').on('submit', function (e) {
+    $( function()  {
+    	$("#gpxsub").click(function (e) {
 	        // On empêche le navigateur de soumettre le formulaire
-    		e.preventDefault();
             $("#chart").html("");
     		var nomfic = $("#FichierInput").val();
     		if (nomfic.match(/\.gpx$/i)){
-	            var $form = $(this); //see http://chez-syl.fr/2015/02/jquery-uploader-une-image-en-ajax-avec-un-apercu-avant-envoi/
+	            var $form = $("#gpsForm"); //see http://chez-syl.fr/2015/02/jquery-uploader-une-image-en-ajax-avec-un-apercu-avant-envoi/
 	            var formdata = (window.FormData) ? new FormData($form[0]) : null;
 	            var data = (formdata !== null) ? formdata : $form.serialize();
 	            $.ajax({
@@ -67,6 +64,14 @@
 	                data: data,
 	                success: function (response) {
 	                	var graphdatas = response['speed_datas'];
+	                	var styles = {
+	 		    	    		//width : "60em",
+	 		    	    		height : "40em",
+	 		    	    		//backgroundColor : "yellow",
+	 		    	    		visibility : "hidden"
+	 		    	    }; 
+	                	$("#chart").css(styles);
+		 		    	$("#chart").addClass("u-full-width");
 	                	Flotr.draw(
      		   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
      		   	           ,[
@@ -83,59 +88,16 @@
      		   	            }
      		   	       );
 	     		   	   $("#chart").css('visibility','visible');
-	     		   	 }) //fin du success callback
+	     		   	 }, //fin du success callback
 	            }); //Fin de la requête Ajax
     		} else {
-    			var messageErreur = $('<h3>').html("<h3>Le fichier /:"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
+    			var messageErreur = $('<h3>').html("<h3>Le fichier :/"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
     			messageErreur.css('color','red');
     			$("#chart").append( messageErreur );
     			$("#chart").css('visibility','visible');
     		}
-    		return false;
-        });
-    	/*$("#gpxsub").on("click",function(){
-    		$("#chart").html("");
-    		var nomfic = $("#FichierInput").val();
-    		if (nomfic.match(/\.gpx$/i)){
-		    	//http://api.jquery.com/jquery.getjson/
-		    	$.getJSON( "traces/aulnay le 11 mars 2015.gpx", function( data ) {//passer en GET ou POST parameters ?
-		    	   var graphdatas = data['speed_datas'];
-		    	   var zero = []
-		    	   //for (i=0; i < graphdatas.length; i++) { zero.push([graphdatas[i][0], 0]); };
-		    	   var styles = {
-		    	    		//width : "60em",
-		    	    		height : "40em",
-		    	    		//backgroundColor : "yellow",
-		    	    		visibility : "hidden"
-		    	     };
-		    	   $("#chart").css(styles);
-		    	   $("#chart").addClass("u-full-width");
-				   Flotr.draw(
-		   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
-		   	           ,[
-		   	               //{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
-		   	               { data: graphdatas, lines: {show:true}},
-		   	            ],
-		   	           {
-		   	               title: "Vitesse de Solène versus distancce parcourue",
-		   	               grid: {horizontalLines: false, verticalLines: false},
-			   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
-				   	            mode: "time",
-				   	            timeformat: "%H:%M:%S" 
-				   	        },
-		   	            }
-		   	       )
-		   	       $("#chart").css('visibility','visible');
-				});
-    		} else {
-    			var messageErreur = $('<h3>').html("<h3>Le fichier /:"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
-    			messageErreur.css('color','red');
-    			$("#chart").append( messageErreur );
-    			$("#chart").css('visibility','visible');
-    		}
-    	});*/
+        }); //fin de la click function de JQuery
    	});
-</script>
-    </script>
+	</script>
 </body>
 </html>
