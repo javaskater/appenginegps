@@ -39,7 +39,17 @@
 				</div>
 			</div>
 		</form>
-		<div class="u-full-width" id="chart">
+		 <div class="row">
+			<div class="ten columns" id="chart">
+			</div>
+			<div class="two columns" id="downloadsection">
+				<form name="image-download" action="" onsubmit="return false"><!-- http://www.humblesoftware.com/flotr2/index#!download-image -->
+	 					<p><label><input type="radio" name="format" value="png" checked="checked" /> PNG</label></p>
+	 					<p><label><input type="radio" name="format" value="jpeg" /> JPEG</label></p>
+	 					<p><label><input type="radio" name="format" value="bmp" /> BMP</label></p>
+	  				<input class="button-primary" value="importer et afficher" type="button" id="downloadbutton">
+	  			</form>
+		</div>
 		</div>
 	</div>
 <!--[if lt IE 9]><script src="/js/excanvas.min.js"></script><![endif]-->
@@ -47,6 +57,16 @@
     <script src="/js/jquery-2.1.4.min.js"></script>
     <script>
     $( function()  {
+    	var export_obj = {
+    			'flot2r_canvas':null,
+    			'save_action':function(e){
+    				var formats_export = $("input[name='format']:checked");
+					if(formats_export.length > 0 && export_obj.flot2r_canvas != null){ //pb is in this case the button wich lanced the event
+						export_obj.flot2r_canvas.download.saveImage(formats_export[0].value); //http://www.humblesoftware.com/flotr2/index#!download-image
+					}
+    			},
+    	};
+    	$("#downloadsection").hide();
     	$("#gpxsub").click(function (e) {
 	        // On empêche le navigateur de soumettre le formulaire
             $("#chart").html("");
@@ -72,15 +92,16 @@
 	 		    	    }; 
 	                	$("#chart").css(styles);
 		 		    	$("#chart").addClass("u-full-width");
-	                	Flotr.draw(
+		 		    	export_obj['flot2r_canvas'] = Flotr.draw(
      		   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
      		   	           ,[
      		   	               //{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
      		   	               { data: graphdatas, lines: {show:true}},
      		   	            ],
      		   	           {
-     		   	               title: "Vitesse de Solène versus distancce parcourue",
-     		   	               grid: {horizontalLines: false, verticalLines: false},
+     		   	        		HtmlText: false, //otherwise the labels are not written on the Canvas and cannot be exported as image !!!
+     		   	        	   title: "Vitesse de Solène versus distancce parcourue",
+     		   	               grid: {horizontalLines: true, verticalLines: true},
      			   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
      				   	            mode: "time",
      				   	            timeformat: "%H:%M:%S" 
@@ -88,9 +109,21 @@
      		   	            }
      		   	       );
 	     		   	   $("#chart").css('visibility','visible');
+	     		   	   $("#downloadsection").show();
+	     		   		var form_tel = $('form[name="image-download"]');
+		     		   	if (navigator.userAgent.match(/msie/i)) { //TODO à vérifier qu'avec canvas.js on ne peut pas télécharger sous IE
+							var messageErreur = $('<h5>').html("Votre navigateur ne vous permet pas de télécharger le graphe sous forme d'image");
+			    			messageErreur.css('color','red');
+			    			form_tel.find(':input:not(:disabled)').prop('disabled',true);
+			    			$('#downloadbutton').prop('disabled',true);
+			    			$('#downloadsection').prepend(messageErreur);
+						}else{
+							$('#downloadbutton').click(export_obj.save_action);
+						}
 	     		   	 }, //fin du success callback
 	            }); //Fin de la requête Ajax
     		} else {
+    			$("#downloadsection").hide();
     			var messageErreur = $('<h3>').html("<h3>Le fichier :/"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
     			messageErreur.css('color','red');
     			$("#chart").append( messageErreur );
