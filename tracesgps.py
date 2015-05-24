@@ -42,7 +42,8 @@ class TraceCalcultationHandler(webapp2.RequestHandler):
         blobstore_gpx_infos = blobstore.get(photo_key)
         if not blobstore_gpx_infos:
             self.error(404)
-        else:     
+        else: 
+            nom_fic_gpx = blobstore_gpx_infos.filename #https://cloud.google.com/appengine/docs/python/blobstore/blobinfoclass
             blob_reader = blobstore.BlobReader(photo_key, buffer_size=1048576) #https://cloud.google.com/appengine/docs/python/blobstore/blobreaderclass
             xml_str_content = ""
             for line in blob_reader:
@@ -58,7 +59,7 @@ class TraceCalcultationHandler(webapp2.RequestHandler):
             distance_parcourue = array_results[-1]['dc']
             #http://stackoverflow.com/questions/12664696/how-to-properly-output-json-with-app-engine-python-webapp2
             json_results = {
-                       'fichier': 'fichier_gpx',
+                       'fichier': nom_fic_gpx,# TODO corriger how to make a query !!!!
                        'speed_datas': donnees_vitesse,
                        'average_speed': vitesse_moyenne,
                        'distance':distance_parcourue

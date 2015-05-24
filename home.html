@@ -83,6 +83,10 @@
 	                dataType: 'json', // selon le retour attendu
 	                data: data,
 	                success: function (response) {
+	                	var titre = $("#TitlelInput").val();
+	     	            if (titre.length == 0){
+	     	            	titre = response['fichier'];
+	     	            }
 	                	var graphdatas = response['speed_datas'];
 	                	var styles = {
 	 		    	    		//width : "60em",
@@ -100,7 +104,7 @@
      		   	            ],
      		   	           {
      		   	        		HtmlText: false, //otherwise the labels are not written on the Canvas and cannot be exported as image !!!
-     		   	        	   title: "Vitesse de Solène versus distancce parcourue",
+     		   	        	   title: titre,
      		   	               grid: {horizontalLines: true, verticalLines: true},
      			   	            xaxis: { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
      				   	            mode: "time",
