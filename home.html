@@ -55,6 +55,7 @@
 <!--[if lt IE 9]><script src="/js/excanvas.min.js"></script><![endif]-->
     <script src="/js/flotr2.min.js"></script>
     <script src="/js/jquery-2.1.4.min.js"></script>
+    <script src="/js/spin.min.js"></script> <!-- http://fgnass.github.io/spin.js/ -->
     <script>
     $( function()  {
     	var export_obj = {
@@ -69,9 +70,13 @@
     	$("#downloadsection").hide();
     	$("#gpxsub").click(function (e) {
 	        // On empêche le navigateur de soumettre le formulaire
+	        $("#chart").hide();
             $("#chart").html("");
     		var nomfic = $("#FichierInput").val();
+    		var spinner = null;
     		if (nomfic.match(/\.gpx$/i)){
+    			spinner =  new Spinner().spin(); //http://fgnass.github.io/spin.js
+    			$(".container").append(spinner.el);
 	            var $form = $("#gpsForm"); //see http://chez-syl.fr/2015/02/jquery-uploader-une-image-en-ajax-avec-un-apercu-avant-envoi/
 	            var formdata = (window.FormData) ? new FormData($form[0]) : null;
 	            var data = (formdata !== null) ? formdata : $form.serialize();
@@ -83,6 +88,7 @@
 	                dataType: 'json', // selon le retour attendu
 	                data: data,
 	                success: function (response) {
+	                	spinner.stop();
 	                	var titre = $("#TitlelInput").val();
 	     	            if (titre.length == 0){
 	     	            	titre = response['fichier'];
@@ -96,6 +102,7 @@
 	 		    	    }; 
 	                	$("#chart").css(styles);
 		 		    	$("#chart").addClass("u-full-width");
+			     		$("#chart").show();
 		 		    	export_obj['flot2r_canvas'] = Flotr.draw(
      		   	           $("#chart")[0] //http://jsfiddle.net/cz37V/1/
      		   	           ,[
@@ -112,8 +119,6 @@
      				   	        },
      		   	            }
      		   	       );
-	     		   	   $("#chart").css('visibility','visible');
-	     		   	   $("#downloadsection").show();
 	     		   		var form_tel = $('form[name="image-download"]');
 		     		   	if (navigator.userAgent.match(/msie/i)) { //TODO à vérifier qu'avec canvas.js on ne peut pas télécharger sous IE
 							var messageErreur = $('<h5>').html("Votre navigateur ne vous permet pas de télécharger le graphe sous forme d'image");
@@ -124,14 +129,24 @@
 						}else{
 							$('#downloadbutton').click(export_obj.save_action);
 						}
+		     		   $("#chart").css('visibility','visible');
+	     		   	   $("#downloadsection").show();
 	     		   	 }, //fin du success callback
+	     		   	error: function (xhr, ajaxOptions, thrownError) {
+		     		   	spinner.stop();
+	     		   		var error_msg = $('<h3>').html("Problème au chargement du fichier cause:"+thrownError+" ,code d'erreur:"+xhr.status);
+	     		   		$('#chart').append(error_msg);
+	     		   	   $("#chart").css('visibility','visible');
+		     		   $("#chart").show();
+	     		      }
 	            }); //Fin de la requête Ajax
     		} else {
     			$("#downloadsection").hide();
-    			var messageErreur = $('<h3>').html("<h3>Le fichier :/"+nomfic+"/ n'est pas un fichier GPX valide</h3>");
+    			$("#chart").css('visibility','visible');
+	     		$("#chart").show();
+    			var messageErreur = $('<h3>').html("Le fichier :/"+nomfic+"/ n'est pas un fichier GPX valide");
     			messageErreur.css('color','red');
     			$("#chart").append( messageErreur );
-    			$("#chart").css('visibility','visible');
     		}
         }); //fin de la click function de JQuery
    	});
