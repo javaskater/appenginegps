@@ -46,7 +46,6 @@
 				<form name="image-download" action="" onsubmit="return false"><!-- http://www.humblesoftware.com/flotr2/index#!download-image -->
 	 					<p><label><input type="radio" name="format" value="png" checked="checked" /> PNG</label></p>
 	 					<p><label><input type="radio" name="format" value="jpeg" /> JPEG</label></p>
-	 					<p><label><input type="radio" name="format" value="bmp" /> BMP</label></p>
 	  				<input class="button-primary" value="importer et afficher" type="button" id="downloadbutton">
 	  			</form>
 		</div>
@@ -70,6 +69,7 @@
     	$("#downloadsection").hide();
     	$("#gpxsub").click(function (e) {
 	        // On empêche le navigateur de soumettre le formulaire
+	        $("#downloadsection").hide();
 	        $("#chart").hide();
             $("#chart").html("");
     		var nomfic = $("#FichierInput").val();
