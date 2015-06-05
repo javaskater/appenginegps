@@ -6,15 +6,11 @@
 	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<!-- FONT
-	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<link href="//fonts.googleapis.com/css?family=Raleway:400,300,600"
-	rel="stylesheet" type="text/css">
-
-<!-- CSS staticc resources through an abssolute url definedd in app.yaml https://cloud.google.com/appengine/docs/python/gettingstartedpython27/staticfiles 
+<!-- CSS static resources through an abssolute url definedd in app.yaml https://cloud.google.com/appengine/docs/python/gettingstartedpython27/staticfiles 
 	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <link rel="stylesheet" href="/bcss/bootstrap.min.css" />
 <link rel="stylesheet" href="/bcss/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="/css/trace.css" />
 
 <!-- 
 	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -24,49 +20,81 @@
 	<!-- For the form http://getskeleton.com/#examples -->
 	<div class="container">
 		<form action="{{ upload_url }}" id="gpsForm" method="POST"
-			enctype="multipart/form-data">
+			enctype="multipart/form-data" class="form-signin">
 			<div class="row">
-				<div class="col-md-4">
-					<span class="label label-default">Le Titre de votre performance:</span>
-				</div>
 				<div class="col-md-8">
-					<input class="form-control" placeholder="Le titre de votre performance"
-					id="TitlelInput" type="text"> 
+					<h3>Cet utilitaire est desinté à vous permettre d'exporter
+						vos traces GPX sous forme de graphiques</h3>
+					<h4>
+						L'intérêt est de vous permettre d'inserer le graphe de vos
+						performances à un article du <a
+							href="http://randosportiversm.blogspot.fr/" target="blank"
+							title="BlogNote de la randonnée sportive"> BlogNote de la
+							Randonnnée sportive du RSM</a>
+					</h4>
+					<p>Cette interface encore minimale est amenée à s'enrichir de
+						foncttionnalitéss par la suite!!!!</p>
 				</div>
-			</div>
-			<div class="row">
 				<div class="col-md-4">
-					<span class="label label-warning">La trace GPS à charger depuis
-						votre ordinateur:</span>
+					<h2 class="form-signin-heading">Entrez votre trace GPX</h2>
+					<label for="TitlelInput" class="sr-only">Le Titre de votre
+						performance</label> <input class="form-control"
+						placeholder="Le titre de votre performance" id="TitlelInput"
+						type="text"> <label for="FichierInput" class="sr-only">La
+						trace GPS à charger depuis votre ordinateur</label> <input
+						class="form-control" placeholder="votre_fichier_gps.gpx"
+						id="FichierInput" name="gpxfile" type="file">
+					<button class="btn btn-lg btn-primary btn-block"
+						id="gpxsub">importer et afficher</button>
 				</div>
-				<div class="col-md-6">
-					<input class="form-control"
-						placeholder="votre_fichier_gps.gpx" id="FichierInput"
-						name="gpxfile" type="file">
-				</div>
-				<div class="col-md-2">
-					<a class="btn btn-default" href="#" role="button" id="gpxsub">importer et afficher</a>
-				</div>
+
 			</div>
 		</form>
-		<div class="row">
-			<div class="col-md-10" id="chart"></div>
-			<div class="col-md-2" id="downloadsection">
-				<form name="image-download" action="" onsubmit="return false">
-					<!-- http://www.humblesoftware.com/flotr2/index#!download-image -->
-					<p>
-						<label><input type="radio" name="format" value="png"
-							checked="checked" /> PNG</label>
-					</p>
-					<p>
-						<label><input type="radio" name="format" value="jpeg" />
-							JPEG</label>
-					</p>
-					<p><a class="btn btn-default" href="#" role="button" id="downloadbutton">exporter comme image</a></p>
-				</form>
-			</div>
-		</div>
 	</div>
+
+	<div class="modal fade" id=myPerfDisplay>
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title">Sélectionnez le format d'export du
+						grpahe ci dessous</h4>
+					<label><input type="radio" name="format" value="png"
+						checked="checked" /> PNG</label> <label><input type="radio"
+						name="format" value="jpeg" />JPEG</label>
+				</div>
+				<div class="modal-body" id="chart">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+					<button type="button" class="btn btn-primary" id="downloadbutton">Exporter</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	
+
+	<div class="modal fade" id=myErrorDisplay>
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="modal-title">Erreur !</h3>
+				</div>
+				<div class="modal-body" id="Errormessage">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	
+	
 	<!--[if lt IE 9]><script src="/js/excanvas.min.js"></script><![endif]-->
 	<script src="/js/flotr2.min.js"></script>
 	<script src="/js/jquery-2.1.4.min.js"></script>
@@ -88,12 +116,15 @@
 					}
 				},
 			};
-			$("#downloadsection").hide();
+			$('#myPerfDisplay').modal({ show: false})
+			$('#myErrorDisplay').modal({ show: false})
 			$("#gpxsub")
 					.click(
 							function(e) {
 								// On empêche le navigateur de soumettre le formulaire
-								$("#downloadsection").hide();
+								e.preventDefault();
+								$('#myPerfDisplay').modal({ show: false})
+								$('#myErrorDisplay').modal({ show: false})
 								$("#chart").hide();
 								$("#chart").html("");
 								var nomfic = $("#FichierInput").val();
@@ -105,121 +136,113 @@
 									var formdata = (window.FormData) ? new FormData(
 											$form[0])
 											: null;
-									var data = (formdata !== null) ? formdata
-											: $form.serialize();
-									$
-											.ajax({
-												url : $form.attr('action'),
-												type : $form.attr('method'),
-												contentType : false, // obligatoire pour de l'upload
-												processData : false, // obligatoire pour de l'upload
-												dataType : 'json', // selon le retour attendu
-												data : data,
-												success : function(response) {
-													spinner.stop();
-													var titre = $(
-															"#TitlelInput")
-															.val();
-													if (titre.length == 0) {
-														titre = response['fichier'];
-													}
-													var graphdatas = response['speed_datas'];
-													var styles = {
-														//width : "60em",
-														height : "40em",
-														//backgroundColor : "yellow",
-														visibility : "hidden"
-													};
-													$("#chart").css(styles);
-													$("#chart").addClass(
-															"u-full-width");
-													$("#chart").show();
-													export_obj['flot2r_canvas'] = Flotr
-															.draw(
-																	$("#chart")[0] //http://jsfiddle.net/cz37V/1/
-																	,
-																	[
-																			//{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
-																			{
-																				data : graphdatas,
-																				lines : {
-																					show : true
-																				}
-																			}, ],
-																	{
-																		HtmlText : false, //otherwise the labels are not written on the Canvas and cannot be exported as image !!!
-																		title : titre,
-																		grid : {
-																			horizontalLines : true,
-																			verticalLines : true
-																		},
-																		xaxis : { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
-																			mode : "time",
-																			timeformat : "%H:%M:%S"
-																		},
-																	});
-													var form_tel = $('form[name="image-download"]');
-													if (navigator.userAgent
-															.match(/msie/i)) { //TODO à vérifier qu'avec canvas.js on ne peut pas télécharger sous IE
-														var messageErreur = $(
-																'<h5>')
-																.html(
-																		"Votre navigateur ne vous permet pas de télécharger le graphe sous forme d'image");
-														messageErreur.css(
-																'color', 'red');
-														form_tel
-																.find(
-																		':input:not(:disabled)')
-																.prop(
-																		'disabled',
-																		true);
-														$('#downloadbutton')
-																.prop(
-																		'disabled',
-																		true);
-														$('#downloadsection')
-																.prepend(
-																		messageErreur);
-													} else {
-														$('#downloadbutton')
-																.click(
-																		export_obj.save_action);
-													}
-													$("#chart").css(
-															'visibility',
-															'visible');
-													$("#downloadsection")
-															.show();
-												}, //fin du success callback
-												error : function(xhr,
-														ajaxOptions,
-														thrownError) {
-													spinner.stop();
-													var error_msg = $('<h3>')
-															.html(
-																	"Problème au chargement du fichier cause:"
-																			+ thrownError
-																			+ " ,code d'erreur:"
-																			+ xhr.status);
-													$('#chart').append(
-															error_msg);
-													$("#chart").css(
-															'visibility',
-															'visible');
-													$("#chart").show();
+									var data = (formdata !== null) ? formdata : $form.serialize();
+									$.ajax({
+										url : $form.attr('action'),
+										type : $form.attr('method'),
+										contentType : false, // obligatoire pour de l'upload
+										processData : false, // obligatoire pour de l'upload
+										dataType : 'json', // selon le retour attendu
+										data : data,
+										success : function(response) {
+											spinner.stop();
+											$('#myPerfDisplay').on('shown.bs.modal', function () {
+												var titre = $(
+												"#TitlelInput")
+												.val();
+												if (titre.length == 0) {
+													titre = response['fichier'];
 												}
-											}); //Fin de la requête Ajax
+												var graphdatas = response['speed_datas'];
+												var styles = {
+													//width : "60em",
+													height : "40em",
+													//backgroundColor : "yellow",
+													visibility : "hidden"
+												};
+												$("#chart").css(styles);
+												$("#chart").show();
+												export_obj['flot2r_canvas'] = Flotr
+														.draw(
+																$("#chart")[0] //http://jsfiddle.net/cz37V/1/
+																,
+																[
+																		//{ data: zero, label: "Dates de passage", lines: {show:true, lineWidth: 1}, shadowSize: 0, color: "#545454" },
+																		{
+																			data : graphdatas,
+																			lines : {
+																				show : true
+																			}
+																		}, ],
+																{
+																	HtmlText : false, //otherwise the labels are not written on the Canvas and cannot be exported as image !!!
+																	title : titre,
+																	grid : {
+																		horizontalLines : true,
+																		verticalLines : true
+																	},
+																	xaxis : { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
+																		mode : "time",
+																		timeformat : "%H:%M:%S"
+																	},
+																});
+												var form_tel = $('form[name="image-download"]');
+												if (navigator.userAgent
+														.match(/msie/i)) { //TODO à vérifier qu'avec canvas.js on ne peut pas télécharger sous IE
+													var messageErreur = $(
+															'<h5>')
+															.html(
+																	"Votre navigateur ne vous permet pas de télécharger le graphe sous forme d'image");
+													messageErreur.css(
+															'color', 'red');
+													form_tel
+															.find(
+																	':input:not(:disabled)')
+															.prop(
+																	'disabled',
+																	true);
+													$('#downloadbutton')
+															.prop(
+																	'disabled',
+																	true);
+													$('#downloadsection')
+															.prepend(
+																	messageErreur);
+												} else {
+													$('#downloadbutton')
+															.click(
+																	export_obj.save_action);
+												}
+												$("#chart").css(
+														'visibility',
+														'visible');		
+											}) //end of modal shown
+											$('#myPerfDisplay').modal({ show: true}); //the div must be visible to display the datas
+										}, //fin du success callback
+										error : function(xhr,
+												ajaxOptions,
+												thrownError) {
+											spinner.stop();
+											var error_msg = $('<h3>')
+													.html(
+															"Problème au chargement du fichier cause:"
+																	+ thrownError
+																	+ " ,code d'erreur:"
+																	+ xhr.status);
+											$('#Errormessage').html(
+													error_msg);
+											$('#myErrorDisplay').modal({ show: true})
+										}
+									}); //Fin de la requête Ajax
 								} else {
-									$("#downloadsection").hide();
-									$("#chart").css('visibility', 'visible');
-									$("#chart").show();
 									var messageErreur = $('<h3>')
 											.html(
 													"Le fichier :/"
 															+ nomfic
 															+ "/ n'est pas un fichier GPX valide");
 									messageErreur.css('color', 'red');
-									$("#chart").append(messageErreur);
+									$("#Errormessage").html(messageErreur);
+									$('#myErrorDisplay').modal({ show: true})
 								}
 							}); //fin de la click function de JQuery
 		});
