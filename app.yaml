@@ -5,12 +5,18 @@ api_version: 1
 threadsafe: true
 
 handlers: #static resources first https://cloud.google.com/appengine/docs/python/gettingstartedpython27/staticfiles 
+- url: /bcss
+  static_dir: bootstrap-3.3.4-dist/css
 - url: /css
   static_dir: css
 - url: /images
   static_dir: images
+- url: /bjs
+  static_dir: bootstrap-3.3.4-dist/js
 - url: /js
-  static_dir: js
+  static_dir: js  
+
+
 - url: .*
   script: tracesgps.application
 
