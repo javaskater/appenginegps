@@ -9,16 +9,18 @@ import calendar
 import jinja2
 import os
 import webapp2
-from GPXHandler import traduction_gpx_vers_csv
+from gpxparse import GpxHandler
 from webapp2_extras import json
-template_env = jinja2.Environment(
-loader=jinja2.FileSystemLoader(os.getcwd()))
+JINJA_ENVIRONMENT = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'],
+    autoescape=True)
     
 class MainPage(webapp2.RequestHandler):
     def get(self):
         current_time = datetime.datetime.now()
         upload_url = blobstore.create_upload_url('/upload_gpx_data')
-        template = template_env.get_template('home.html')
+        template = JINJA_ENVIRONMENT.get_template('home.html')
         context = {
                    'ajourdhui': current_time,
                    'upload_url': upload_url
@@ -49,7 +51,8 @@ class TraceCalcultationHandler(webapp2.RequestHandler):
             for line in blob_reader:
                 xml_str_content += line
             #todo: prévoir une condition le contenu n'est pas vide ?
-            array_results = traduction_gpx_vers_csv(xml_str_content) #{'iplot':iout_path,'lplot':lout_path,'donnees':avancees}
+            handler = GpxHandler()
+            array_results = handler.traduction_gpx_vers_csv(xml_str_content) #{'iplot':iout_path,'lplot':lout_path,'donnees':avancees}
             vitesse_moyenne = 0
             donnees_vitesse = []
             for res_dict in array_results:
@@ -67,6 +70,6 @@ class TraceCalcultationHandler(webapp2.RequestHandler):
             self.response.content_type = 'application/json'
             self.response.write(json.encode(json_results))
 
-application = webapp2.WSGIApplication([('/', MainPage), ('/upload_gpx_data', TracesUploadHandler),('/traces/(.+)$', TraceCalcultationHandler)],
+application = webapp2.WSGIApplication([(r'/', MainPage), (r'/upload_gpx_data', TracesUploadHandler),(r'/traces/(.+)$', TraceCalcultationHandler)],
 debug=True)
 
