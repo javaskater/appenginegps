@@ -13,6 +13,8 @@ handlers:
   static_dir: bootstrap-3.3.4-dist/css
 - url: /js
   static_dir: js
+- url: /bjs
+  static_dir: bootstrap-3.3.4-dist/js
 - url: /.*
   script: tracesgps.application
 

@@ -10,6 +10,7 @@ import jinja2
 import os
 import webapp2
 from gpxparse import GpxHandler
+from fitutils import GaeBlobStoreDatas
 from webapp2_extras import json
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
@@ -45,24 +46,41 @@ class TraceCalcultationHandler(webapp2.RequestHandler):
         if not blobstore_gpx_infos:
             self.error(404)
         else: 
-            nom_fic_gpx = blobstore_gpx_infos.filename #https://cloud.google.com/appengine/docs/python/blobstore/blobinfoclass
+            uploaded_file = blobstore_gpx_infos.__dict__['_BlobInfo__entity']
+            #other solution nom_fic_gpx = blobstore_gpx_infos.filename #https://cloud.google.com/appengine/docs/python/blobstore/blobinfoclass
             blob_reader = blobstore.BlobReader(photo_key, buffer_size=1048576) #https://cloud.google.com/appengine/docs/python/blobstore/blobreaderclass
-            xml_str_content = ""
-            for line in blob_reader:
-                xml_str_content += line
-            #todo: prévoir une condition le contenu n'est pas vide ?
-            handler = GpxHandler()
-            array_results = handler.traduction_gpx_vers_csv(xml_str_content) #{'iplot':iout_path,'lplot':lout_path,'donnees':avancees}
+            performance_filename = uploaded_file['filename']
             vitesse_moyenne = 0
             donnees_vitesse = []
-            for res_dict in array_results:
-                donnees_vitesse.append([calendar.timegm(res_dict['t'].timetuple()) * 1000,res_dict['vl']*3.6]) #https://flot.googlecode.com/svn/trunk/API.txt timestaps in milliseconds
-                vitesse_moyenne += res_dict['vl']
-            vitesse_moyenne = vitesse_moyenne/len(array_results)
-            distance_parcourue = array_results[-1]['dc']
+            distance_parcourue = 0
+            if performance_filename.endswith('.gpx'):
+                xml_str_content = ""
+                for line in blob_reader:
+                    xml_str_content += line
+                #todo: prévoir une condition le contenu n'est pas vide ?
+                handler = GpxHandler()
+                array_results = handler.traduction_gpx_vers_csv(xml_str_content) #{'iplot':iout_path,'lplot':lout_path,'donnees':avancees}
+                
+                for res_dict in array_results:
+                    donnees_vitesse.append([calendar.timegm(res_dict['t'].timetuple()) * 1000,res_dict['vl']*3.6]) #https://flot.googlecode.com/svn/trunk/API.txt timestaps in milliseconds
+                    vitesse_moyenne += res_dict['vl']
+                vitesse_moyenne = vitesse_moyenne/len(array_results)
+                distance_parcourue = array_results[-1]['dc']
+            elif performance_filename.endswith('.fit'):
+                handler=GaeBlobStoreDatas(blob_reader)
+                array_results = handler.parse(hook_func=handler.transform_fitpoint_entry)
+                nbpoints = 0
+                for res_dict in array_results:
+                    fit_dict = res_dict['fit']
+                    if fit_dict is not None:
+                        nbpoints+=1
+                        donnees_vitesse.append(fit_dict['timestamp'], fit_dict['speed']) #https://flot.googlecode.com/svn/trunk/API.txt timestaps in milliseconds
+                        vitesse_moyenne += fit_dict['speed']
+                        distance_parcourue = fit_dict['total_distance']
+                vitesse_moyenne = vitesse_moyenne/nbpoints
             #http://stackoverflow.com/questions/12664696/how-to-properly-output-json-with-app-engine-python-webapp2
             json_results = {
-                       'fichier': nom_fic_gpx,# TODO corriger how to make a query !!!!
+                       'fichier': performance_filename,# TODO corriger how to make a query !!!!
                        'speed_datas': donnees_vitesse,
                        'average_speed': vitesse_moyenne,
                        'distance':distance_parcourue

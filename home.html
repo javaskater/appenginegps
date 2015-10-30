@@ -39,7 +39,7 @@
 					<p><a href="https://github.com/javaskater/appenginegps" target="blank">Lien GitHub vers le code source de cette application Google App Engine</a></p>
 				</div>
 				<div class="col-md-4">
-					<h2 class="form-signin-heading">Entrez votre trace GPX</h2>
+					<h2 class="form-signin-heading">Entrez votre trace GPX ou FIT</h2>
 					<label for="TitlelInput" class="sr-only">Le Titre de votre
 						performance</label> <input class="form-control"
 						placeholder="Le titre de votre performance" id="TitlelInput"
@@ -133,7 +133,7 @@
 								$("#chart").html("");
 								var nomfic = $("#FichierInput").val();
 								var spinner = null;
-								if (nomfic.match(/\.gpx$/i)) {
+								if (nomfic.match(/\.(gpx|fit)$/i)) {
 									spinner = new Spinner().spin(); //http://fgnass.github.io/spin.js
 									$(".container").append(spinner.el);
 									var $form = $("#gpsForm"); //see http://chez-syl.fr/2015/02/jquery-uploader-une-image-en-ajax-avec-un-apercu-avant-envoi/
@@ -243,7 +243,7 @@
 											.html(
 													"Le fichier :/"
 															+ nomfic
-															+ "/ n'est pas un fichier GPX valide");
+															+ "/ n'est pas un fichier GPX fou FIT valide");
 									messageErreur.css('color', 'red');
 									$("#Errormessage").html(messageErreur);
 									$('#myErrorDisplay').modal({ show: true})
