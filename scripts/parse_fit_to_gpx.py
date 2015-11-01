@@ -134,7 +134,9 @@ for fpath in filenames:
     if fdate is not None:
        start_date_activity = datetime.strftime(fdate,"%Y-%m-%sT%H:%M:%SZ")
     #begin the GPX File !!!
-    with open(fxpath, 'rt') as f:
+    if not os.path.exists(fxpath):
+        open(fxpath, 'w').close()
+    with open(fxpath, 'rt+') as f:
         print ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
         print ("<gpx creator=\"jpmena\"")
         print (" xmlns:gpxtrx=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")

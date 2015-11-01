@@ -24,7 +24,7 @@
 			<div class="row">
 				<div class="col-md-8">
 					<h3>Cet utilitaire est destiné dans un premier temps à vous permettre d'exporter
-						vos traces GPX sous forme de graphiques</h3>
+						vos traces GPX (.gpx) ou vos fichiers Garmin (.fit)  sous forme de graphique</h3>
 					<h4>
 						L'intérêt est de permettre au patineur d'Aulnay de visualiser le graphe de ses
 						performances puis de l'exporter sous forme d'image pour, au final, le joindre à un article du <a
@@ -61,7 +61,7 @@
 			<div class="modal-content">
 				<div class="modal-header">
 					<h4 class="modal-title">Sélectionnez le format d'export du
-						grpahe ci dessous</h4>
+						graphe ci dessous</h4>
 					<label><input type="radio" name="format" value="png"
 						checked="checked" /> PNG</label> <label><input type="radio"
 						name="format" value="jpeg" />JPEG</label>
@@ -187,7 +187,11 @@
 																	},
 																	xaxis : { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
 																		mode : "time",
-																		timeformat : "%H:%M:%S"
+																		timeformat : "%H:%M:%S",
+																		showLabels : true,
+																	},
+																	yaxis: {
+																		showLabels: true
 																	},
 																});
 												var form_tel = $('form[name="image-download"]');
