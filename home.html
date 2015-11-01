@@ -158,6 +158,7 @@
 													titre = response['fichier'];
 												}
 												var graphdatas = response['speed_datas'];
+												var graphmetas = response['graph_metas'];
 												var styles = {
 													//width : "60em",
 													height : "40em",
@@ -188,10 +189,10 @@
 																	xaxis : { //http://stackoverflow.com/questions/11248927/putting-timestamp-onto-x-axis-in-flotr2-line-graph
 																		mode : "time",
 																		timeformat : "%H:%M:%S",
-																		showLabels : true,
+																		title : graphmetas['xtitle'],
 																	},
 																	yaxis: {
-																		showLabels: true
+																		title : graphmetas['ytitle'],
 																	},
 																});
 												var form_tel = $('form[name="image-download"]');
