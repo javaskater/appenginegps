@@ -8,15 +8,16 @@
 
 <!-- CSS static resources through an abssolute url definedd in app.yaml https://cloud.google.com/appengine/docs/python/gettingstartedpython27/staticfiles 
 	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<link rel="stylesheet" href="/bcss/bootstrap.min.css" />
-<link rel="stylesheet" href="/bcss/bootstrap-theme.min.css" />
+<link rel="stylesheet" href="/bootstrap_css/bootstrap.min.css" />
+<link rel="stylesheet" href="/bootstrap_css/bootstrap-theme.min.css" />
 <link rel="stylesheet" href="/css/trace.css" />
+<link rel="stylesheet" href="/css/upload.css" />
 
 <!-- 
 	  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
 <link rel="icon" type="image/png" href="/images/roue2.png" />
 </head>
-<body>
+<body ng-app="fileUpload" ng-controller="UploadCtrl">
 	<!-- For the form http://getskeleton.com/#examples -->
 	<div class="container">
 		<form action="{{ upload_url }}" id="gpsForm" method="POST"
@@ -48,8 +49,33 @@
 						class="form-control" placeholder="votre_fichier_gps.gpx"
 						id="FichierInput" name="gpxfile" type="file">
 						<h4>Prêt à visualiser votre performance ?</h4>
-						<button class="btn btn-lg btn-primary btn-block"
-							id="gpxsub">importer et afficher</button>
+						<!--<button class="btn btn-lg btn-primary btn-block"
+							id="gpxsub">importer et afficher</button>-->
+						<form name="uploadForm">
+						    <fieldset>
+						      <legend>Upload on form submit</legend>
+						      Username:
+						      <input type="text" name="userName" ng-model="username" size="31" required>
+						      <i ng-show="uploadForm.userName.$error.required">*required</i>
+						      <br>Photo:
+						      <input type="file" ngf-select ng-model="gpsFile" name="file"    
+						             accept="image/*" ngf-max-size="2MB" required>
+						      <i ng-show="uploadForm.file.$error.required">*required</i><br>
+						      <i ng-show="uploadForm.file.$error.maxSize">File too large 
+						          <span ng-bind="gpsFile.size / 1000000|number:1"></span>MB: max 2M</i>
+						      <img ng-show="uploadForm.file.$valid" ngf-thumbnail="gpsFile" class="thumb"> <button ng-click="gpsFile = null" ng-show="gpsFile">Remove</button>
+						      <br>
+						      <button ng-disabled="!myForm.$valid" 
+						              ng-click="uploadGpsFile(gpsFile)">Submit</button>
+						      <span class="progress" ng-show="gpsFile.progress >= 0">
+						        <div style='width:<span ng-bind="gpsFile.progress"></span>%' 
+						            ng-bind="gpsFile.progress + '%'"></div>
+						      </span>
+						      <span ng-show="gpsFile.result">Upload Successful</span>
+						      <span class="err" ng-show="errorMsg"><span ng-bind="errorMsg"></span></span>
+						    </fieldset>
+					    	<br>
+					  	</form>
 				</div>
 
 			</div>
@@ -103,12 +129,17 @@
 	<script src="/js/flotr2.min.js"></script>
 	<script src="/js/jquery-2.1.4.min.js"></script>
 	<!-- <script src="/js/bootstrap.js"></script> -->
-	<script src="/bjs/bootstrap.min.js"></script>
-
+	<script src="/bootstrap_js/bootstrap.min.js"></script>
+	<script src="/bower_js/angular.min.js"></script>
+	<script src="/bower_js/ng-file-upload-shim(.min).js"></script> <!-- for no html5 browsers support -->
+	<script src="/bower_js/ng-file-upload.min.js"></script>
 	<script src="/js/spin.min.js"></script>
+
+	<script src="/js/upload.js"></script>
 	<!-- http://fgnass.github.io/spin.js/ -->
 	<script>
 		$(function() {
+			//graphics part !!!
 			var export_obj = {
 				'flot2r_canvas' : null,
 				'save_action' : function(e) {

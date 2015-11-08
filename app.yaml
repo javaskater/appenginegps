@@ -9,12 +9,16 @@ handlers:
   static_dir: images
 - url: /css
   static_dir: css
-- url: /bcss
+- url: /bootstrap_css
   static_dir: bootstrap-3.3.4-dist/css
 - url: /js
   static_dir: js
-- url: /bjs
+- url: /bower_js
+  static_dir: js/bower_components
+- url: /bootstrap_js
   static_dir: bootstrap-3.3.4-dist/js
+- url: /js
+  static_dir: js
 - url: /.*
   script: tracesgps.application
 
